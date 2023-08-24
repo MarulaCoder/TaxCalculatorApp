@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaxCalculator.Application.Models.Requests;
+using TaxCalculator.Domain.Core.Repositories;
 using TaxCalculator.Domain.Core.Shared;
 
 namespace TaxCalculator.Application.Services
@@ -12,16 +13,32 @@ namespace TaxCalculator.Application.Services
     {
         #region Fields
 
+        private readonly ITaxTypeRepository _taxTypeRepository;
+
         #endregion
 
         #region Constructors
+
+        public TaxCalculatorService(ITaxTypeRepository taxTypeRepository)
+        { 
+            _taxTypeRepository = taxTypeRepository ?? throw new ArgumentNullException(nameof(taxTypeRepository));
+        }
+
         #endregion
 
         #region Public Methods
 
         public Task<Result> CalculateTax(CalculateTaxRequest request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var result = Result.Failure("Initilization");
+
+            var response = _taxTypeRepository.GetTaxType(request.PostalCode);
+            if (response != null) 
+            {
+                result = Result.Failure("Tax type not found");
+            }
+
+            return Task.FromResult(result);
         }
 
         #endregion

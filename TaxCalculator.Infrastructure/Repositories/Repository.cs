@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaxCalculator.Domain.Core.Repositories;
 using TaxCalculator.Domain.Core.Shared;
 using TaxCalculator.Infrastructure.Context;
 
@@ -14,45 +15,55 @@ namespace TaxCalculator.Infrastructure.Repositories
         #region Properties
 
         private readonly AppDbContext _context;
+        private DbSet<TEntity> _dbSet;
 
         #endregion
 
-        public Repository(AppDbContext context) 
+        #region Constructors
+
+        public Repository(AppDbContext context)
         {
             _context = context;
+            _dbSet = _context.Set<TEntity>();
         }
 
-        public async Task<TEntity> AddAsync(TEntity entity)
-        {
-            var result = await _context.Set<TEntity>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+        #endregion
 
-            return result.Entity;
-        }
+        #region Public Methods
 
-        public async Task DeleteAsync(int id)
+        public async Task<TEntity> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var entity = await GetByIdAsync(id);
-            _context.Set<TEntity>().Remove(entity);
-            await _context.SaveChangesAsync();
+            return await _dbSet.FindAsync(id, cancellationToken);
         }
 
         public IEnumerable<TEntity> GetAll()
         {
-            return _context.Set<TEntity>().AsNoTracking();
+            return _dbSet.AsNoTracking();
         }
 
-        public async Task<TEntity> GetByIdAsync(int id)
+        public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken)
         {
-            return await _context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
-        }
-
-        public async Task<TEntity> UpdateAsync(TEntity entity)
-        {
-            var result = _context.Set<TEntity>().Update(entity);
-            await _context.SaveChangesAsync();
+            var result = await _dbSet.AddAsync(entity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return result.Entity;
         }
+
+        public async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken cancellationToken)
+        {
+            var result = _dbSet.Update(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return result.Entity;
+        }
+
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken)
+        {
+            var entity = await GetByIdAsync(id, cancellationToken);
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        #endregion
     }
 }

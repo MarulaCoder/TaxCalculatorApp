@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Entities;
 
-namespace TaxCalculator.Infrastructure.Repositories
+namespace TaxCalculator.Domain.Core.Repositories
 {
     public interface ITaxTypeRepository : IRepository<TaxType>
     {
-        TaxType GetTaxType(string code, CancellationToken cancellationToken);
+        TaxType GetTaxType(string code);
     }
 }

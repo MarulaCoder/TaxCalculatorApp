@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Entities;
+using TaxCalculator.Domain.Core.Repositories;
 using TaxCalculator.Infrastructure.Context;
 
 namespace TaxCalculator.Infrastructure.Repositories
@@ -25,11 +26,9 @@ namespace TaxCalculator.Infrastructure.Repositories
 
         #region Public Methods
 
-        public TaxType GetTaxType(string code, CancellationToken cancellationToken)
+        public TaxType GetTaxType(string code)
         {
-            var entity = GetAll().FirstOrDefault(x => x.Code == code);
-
-            return entity;
+            return GetAll().FirstOrDefault(x => x.Code == code);
         }
 
         #endregion

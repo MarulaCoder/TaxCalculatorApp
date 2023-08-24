@@ -33,7 +33,7 @@ namespace TaxCalculator.Application.Services
             var result = Result.Failure("Initilization");
 
             var response = _taxTypeRepository.GetTaxType(request.PostalCode);
-            if (response != null) 
+            if (response == null) 
             {
                 result = Result.Failure("Tax type not found");
             }

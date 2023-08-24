@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaxCalculator.Domain.Shared
+namespace TaxCalculator.Domain.Core.Shared
 {
     public class Result
     {

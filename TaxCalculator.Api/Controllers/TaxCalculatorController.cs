@@ -12,7 +12,7 @@ namespace TaxCalculator.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TaxCalculatorConttroller : ControllerBase
+    public class TaxCalculatorController : ControllerBase
     {
         #region Fields
 
@@ -22,7 +22,7 @@ namespace TaxCalculator.Api.Controllers
 
         #region Constructors
 
-        public TaxCalculatorConttroller(ITaxCalculatorService taxCalculatorService)
+        public TaxCalculatorController(ITaxCalculatorService taxCalculatorService)
         {
             _taxCalculatorService = taxCalculatorService ?? throw new ArgumentNullException(nameof(taxCalculatorService));
         }

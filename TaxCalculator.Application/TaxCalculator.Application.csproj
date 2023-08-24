@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TaxCalculator.Domain\TaxCalculator.Domain.csproj" />
+    <ProjectReference Include="..\TaxCalculator.Domain\TaxCalculator.Domain.Core.csproj" />
   </ItemGroup>
 
 </Project>

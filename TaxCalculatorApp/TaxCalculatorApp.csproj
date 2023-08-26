@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TaxCalculator.Application\TaxCalculator.Application.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -50,6 +50,32 @@ namespace TaxCalculator.Api.Controllers
             }
 
             var result = await _taxCalculatorService.CalculateTax(request, cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets tax information.
+        /// </summary>
+        /// <param name="request">The calculate tax request</param>
+        /// <returns>The calculated tax.</returns>
+        [HttpPost]
+        [Route("information")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetTaxInformation(CancellationToken cancellationToken)
+        {
+            var result = await _taxCalculatorService.GetTaxInformation(cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
             return Ok(result);
         }
 

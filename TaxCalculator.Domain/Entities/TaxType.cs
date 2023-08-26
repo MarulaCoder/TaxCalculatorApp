@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaxCalculator.Domain.Core.Enums;
 using TaxCalculator.Domain.Core.Shared;
 
 namespace TaxCalculator.Domain.Core.Entities
@@ -11,7 +12,7 @@ namespace TaxCalculator.Domain.Core.Entities
     {
         #region Constructors
 
-        public TaxType(string code, string type) 
+        public TaxType(string code, TaxTypeEnum type) 
         {
             Code = code;
             Type = type;
@@ -23,26 +24,23 @@ namespace TaxCalculator.Domain.Core.Entities
 
         public int Id { get; private set; }
         public string Code { get; private set; }
-        public string Type { get; private set; }
+        public TaxTypeEnum Type { get; private set; }
 
         #endregion
 
         #region Public Methods
 
-        public static TaxType Create(string code, string type) 
+        public static TaxType Create(string code, TaxTypeEnum type) 
         { 
             return new TaxType(code, type);
         }
 
-        public void Update(string code, string type)
+        public void Update(string code, TaxTypeEnum type)
         {
             Code = code;
             Type = type;
         }
 
-        #endregion
-
-        #region Private Methods
         #endregion
     }
 }

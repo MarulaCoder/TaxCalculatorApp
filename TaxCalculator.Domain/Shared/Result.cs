@@ -10,7 +10,7 @@ namespace TaxCalculator.Domain.Core.Shared
     {
         #region Constructors
 
-        private Result(bool isSuccessful, string errorMessage) 
+        protected Result(bool isSuccessful, string errorMessage) 
         {
             if (!isSuccessful && string.IsNullOrWhiteSpace(errorMessage))
             { 
@@ -36,6 +36,35 @@ namespace TaxCalculator.Domain.Core.Shared
         public static Result Success() => new Result(true, string.Empty);
 
         public static Result Failure(string errorMessage) => new Result(false, errorMessage);
+
+        public static Result<TData> Success<TData>(TData data) => new Result<TData>(data, true, string.Empty);
+
+        public static Result<TData> Failure<TData>(string errorMessage) => new Result<TData>(default, false, errorMessage);
+
+        #endregion
+    }
+
+    public class Result<TData> : Result
+    {
+        #region Fields
+
+        private readonly TData _data;
+
+        #endregion
+
+        #region Constructors
+
+        protected internal Result(TData data, bool isSuccessful, string errorMessage)
+            : base(isSuccessful, errorMessage)
+        { 
+            _data = data;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public TData Data { get { if (IsSuccessful) { return _data; } throw new InvalidOperationException("The data of a failure result cannot be accessed."); } }
 
         #endregion
     }

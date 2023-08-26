@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TaxCalculator.Application.Models.Requests;
 using TaxCalculator.Application.Services;
+using TaxCalculator.Domain.Core.Entities;
+using TaxCalculator.Domain.Core.Enums;
 using TaxCalculator.Domain.Core.Repositories;
 
 namespace TaxCalculator.Tests.Application
@@ -15,15 +17,15 @@ namespace TaxCalculator.Tests.Application
     {
         #region Setup
 
-        private Mock<ITaxTypeRepository> _taxTypeRepository;
+        private Mock<ITaxRepository> _taxRepository;
         private ITaxCalculatorService _service;
         private CancellationToken cancellationToken = new CancellationToken();
 
         [SetUp]
         public void Setup()
         {
-            _taxTypeRepository = new Mock<ITaxTypeRepository>();
-            _service = new TaxCalculatorService(_taxTypeRepository.Object);
+            _taxRepository = new Mock<ITaxRepository>();
+            _service = new TaxCalculatorService(_taxRepository.Object);
         }
 
         #endregion
@@ -35,7 +37,7 @@ namespace TaxCalculator.Tests.Application
         public async Task CalculateTax_ShouldFail_InvalidTaxType()
         {
             // Arrange
-            _taxTypeRepository.Setup(x => x.GetTaxType(It.IsAny<string>()))
+            _taxRepository.Setup(x => x.GetTaxType(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Returns(() => null);
 
             // Act
@@ -44,7 +46,26 @@ namespace TaxCalculator.Tests.Application
             // Assert
             Assert.IsFalse(result.IsSuccessful);
             Assert.IsTrue(result.IsFailure);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(result.ErrorMessage));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result.ErrorMessage));
+        }
+
+        [Test]
+        public async Task CalculateTax_ShouldFail_InvalidTaxRate()
+        {
+            // Arrange
+            _taxRepository.Setup(x => x.GetTaxType(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(() => TaxType.Create("1000", TaxTypeEnum.Progressive));
+
+            _taxRepository.Setup(x => x.GetTaxRateByIncome(It.IsAny<decimal>(), It.IsAny<CancellationToken>()))
+                .Returns(() => null);
+
+            // Act
+            var result = await _service.CalculateTax(new CalculateTaxRequest(), cancellationToken);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.IsTrue(result.IsFailure);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result.ErrorMessage));
         }
 
         #endregion

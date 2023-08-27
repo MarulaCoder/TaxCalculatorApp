@@ -1,12 +1,24 @@
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using TaxCalculator.Application;
 using TaxCalculator.Infrastructure;
+using TaxCalculator.Infrastructure.Context;
+using TaxCalculator.Infrastructure.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddCors();
+builder.Services.AddCors(policy =>
+{
+    policy.AddPolicy("CorsPolicy", opt => opt
+        //.WithOrigins("http://localhost:5283", "https://localhost:7114")
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
 builder.Services.AddControllers().AddJsonOptions(x =>
 {
     // serialize enums as strings in api responses (e.g. Role)
@@ -26,44 +38,8 @@ builder.Services.AddInfrastructureLayer(builder.Configuration);
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    SeedData.Initialize(services);
-}
-
-using (var context = new AppDbContextContext(
-            serviceProvider.GetRequiredService<
-                DbContextOptions<AppDbContext>>()))
-{
-    // Look for any movies.
-    if (!context.TaxRates.Any())
-    {
-        var taxRates = TaxSeedData.GetTaxRates();
-        context.TaxRates.AddRange(taxRates);
-    }
-
-    if (!context.TaxTypes.Any())
-    { 
-        var taxTypes = TaxSeedData.GetTaxTypes();
-        context.TaxTypes.AddRange(taxTypes);
-    }
-
-    if (context.FlatValueTax == null)
-    {
-        var flatValueTax = TaxSeedData.GetFlatValueTax();
-        context.FlatValueTax.Add(flatValueTax);
-    }
-
-    if (context.FlatRateTax == null)
-    {
-        var flatValueTax = TaxSeedData.GetFlatRateTax();
-        context.FlatRateTax.Add(flatRateTax);
-    }
-
-    context.SaveChanges();
-}
+using var scope = app.Services.CreateScope();
+TaxSeedData.InitializeData(scope.ServiceProvider);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

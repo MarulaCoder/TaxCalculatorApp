@@ -12,11 +12,12 @@ namespace TaxCalculator.Domain.Core.Entities
     {
         #region Constructors
 
-        private TaxRate(decimal rate, decimal minValue, decimal maxValue) 
+        private TaxRate(decimal rate, decimal minValue, decimal maxValue, TaxLevelEnum taxLevel) 
         { 
             Rate = rate;
             MinValue = minValue;
             MaxValue = maxValue;
+            TaxLevel = taxLevel;
         }
 
         #endregion
@@ -33,16 +34,17 @@ namespace TaxCalculator.Domain.Core.Entities
 
         #region Public Methods
 
-        public static TaxRate Create(decimal rate, decimal minValue, decimal maxValue) 
+        public static TaxRate Create(decimal rate, decimal minValue, decimal maxValue, TaxLevelEnum taxLevel) 
         { 
-            return new TaxRate(rate, minValue, maxValue);
+            return new TaxRate(rate, minValue, maxValue, taxLevel);
         }
 
-        public void Update(decimal rate, decimal minValue, decimal maxValue)
+        public void Update(decimal rate, decimal minValue, decimal maxValue, TaxLevelEnum taxLevel)
         {
             Rate = rate;
             MinValue = minValue;
             MaxValue = maxValue;
+            TaxLevel = taxLevel;
         }
 
         #endregion

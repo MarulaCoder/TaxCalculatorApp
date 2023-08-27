@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxCalculator.Infrastructur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxCalculator.Api", "TaxCalculator.Api\TaxCalculator.Api.csproj", "{CE0F6484-F108-4621-A169-FE53C9663462}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{F7AEAB69-53BF-4FF8-9E42-DFC36EEC2059}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaxCalculatorAppUI", "TaxCalculatorAppUI\TaxCalculatorAppUI.csproj", "{0572886F-8DE0-4B34-BCB8-BF12305423CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +53,10 @@ Global
 		{CE0F6484-F108-4621-A169-FE53C9663462}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE0F6484-F108-4621-A169-FE53C9663462}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE0F6484-F108-4621-A169-FE53C9663462}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0572886F-8DE0-4B34-BCB8-BF12305423CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0572886F-8DE0-4B34-BCB8-BF12305423CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0572886F-8DE0-4B34-BCB8-BF12305423CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0572886F-8DE0-4B34-BCB8-BF12305423CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +67,7 @@ Global
 		{DDDC8DC9-E647-46DC-AB16-C30DFA4E7E3F} = {32D133F1-6D56-4634-A436-A8FD0CC57944}
 		{B0E23AAE-3014-403F-B2BF-4267F4E3BCF4} = {94419822-ECB0-4822-8076-DDD836055DEB}
 		{CE0F6484-F108-4621-A169-FE53C9663462} = {35DC1705-788A-4DA0-8AE2-735150C4F2D3}
+		{0572886F-8DE0-4B34-BCB8-BF12305423CE} = {F7AEAB69-53BF-4FF8-9E42-DFC36EEC2059}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A553F5CD-2CEA-4E85-88D9-3D856AA6FA86}

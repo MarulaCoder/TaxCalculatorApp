@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Entities;
 using TaxCalculator.Domain.Core.Repositories;
+using TaxCalculator.Domain.Core.Shared;
 using TaxCalculator.Infrastructure.Context;
 
 namespace TaxCalculator.Infrastructure.Repositories
@@ -41,17 +42,20 @@ namespace TaxCalculator.Infrastructure.Repositories
 
         public async Task<List<TaxRate>> GetAllTaxRates(CancellationToken cancellationToken)
         { 
-            return await _dbContext.TaxRates.ToListAsync();
+            var result = await _dbContext.TaxRates.ToListAsync();
+            return result;
         }
 
         public async Task<FlatValueTax> GetFlatValueTax(CancellationToken cancellationToken)
         {
-            return await _dbContext.FlatValueTax.FirstOrDefaultAsync();
+            var result = await _dbContext.FlatValueTax.FirstOrDefaultAsync();
+            return result;
         }
 
         public async Task<FlatRateTax> GetFlatRateTax(CancellationToken cancellationToken)
-        { 
-            return await _dbContext.FlatRateTax.FirstOrDefaultAsync();
+        {
+            var result = await _dbContext.FlatRateTax.FirstOrDefaultAsync();
+            return result;
         }
 
         public async Task PersistTaxCalculation(CalculatedTax calculatedTax, CancellationToken cancellationToken)

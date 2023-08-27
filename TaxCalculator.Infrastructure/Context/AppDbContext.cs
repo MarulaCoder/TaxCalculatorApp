@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Entities;
+using TaxCalculator.Domain.Core.Enums;
 
 namespace TaxCalculator.Infrastructure.Context
 {
@@ -44,10 +45,14 @@ namespace TaxCalculator.Infrastructure.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Code)
+                    .HasColumnType("varchar")
                     .HasMaxLength(5)
                     .IsRequired();
 
                 entity.Property(e => e.Type)
+                    .HasConversion(
+                        v => v.ToString(),
+                        v => (TaxTypeEnum)Enum.Parse(typeof(TaxTypeEnum), v))
                     .HasMaxLength(15)
                     .IsRequired();
             });
@@ -58,12 +63,22 @@ namespace TaxCalculator.Infrastructure.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Rate)
+                    .HasPrecision(5,2)
                     .IsRequired();
 
                 entity.Property(e => e.MinValue)
+                    .HasPrecision(19, 4)
                     .IsRequired();
 
                 entity.Property(e => e.MaxValue)
+                    .HasPrecision(19, 4)
+                    .IsRequired();
+
+                entity.Property(e => e.TaxLevel)
+                    .HasConversion(
+                        v => v.ToString(),
+                        v => (TaxLevelEnum)Enum.Parse(typeof(TaxLevelEnum), v))
+                    .HasMaxLength(15)
                     .IsRequired();
             });
 
@@ -73,12 +88,15 @@ namespace TaxCalculator.Infrastructure.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.FlatValue)
+                    .HasPrecision(19, 4)
                     .IsRequired();
 
                 entity.Property(e => e.Threshold)
+                    .HasPrecision(19, 4)
                     .IsRequired();
 
                 entity.Property(e => e.ThresholdRate)
+                    .HasPrecision(5, 2)
                     .IsRequired();
             });
 
@@ -88,6 +106,7 @@ namespace TaxCalculator.Infrastructure.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.FlatRate)
+                    .HasPrecision(5, 2)
                     .IsRequired();
             });
 
@@ -97,15 +116,20 @@ namespace TaxCalculator.Infrastructure.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.AnnualIncome)
+                    .HasPrecision(19, 4)
                     .IsRequired();
 
                 entity.Property(e => e.PostalCode)
+                    .HasColumnType("varchar")
+                    .HasMaxLength(4)
                     .IsRequired();
 
                 entity.Property(e => e.TaxAmount)
+                    .HasPrecision(19, 4)
                     .IsRequired();
 
                 entity.Property(e => e.Created)
+                    .HasColumnType("date")
                     .IsRequired();
             });
         }

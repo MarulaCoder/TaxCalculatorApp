@@ -37,15 +37,19 @@ namespace TaxCalculator.Infrastructure
                options.UseSqlServer(connectionString,
                    builder => builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
+            //services.AddDbContextFactory<AppDbContext>(
+            //    options =>
+            //        options.UseSqlServer(connectionString));
+
             return services;
         }
 
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services
-                .AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork))
-                .AddTransient(typeof(IRepository), typeof(Repository))
-                .AddTransient<ITaxRepository, TaxRepository>();
+                .AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork))
+                .AddScoped(typeof(IRepository), typeof(Repository))
+                .AddScoped<ITaxRepository, TaxRepository>();
 
             return services;
         }

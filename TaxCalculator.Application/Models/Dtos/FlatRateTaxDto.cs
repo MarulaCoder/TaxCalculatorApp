@@ -12,7 +12,7 @@ namespace TaxCalculator.Application.Models.Dtos
         #region Properties
 
         public TaxTypeEnum TaxType { get; set; }
-        public decimal Rate { get; set; }
+        public decimal? Rate { get; set; }
 
         #endregion
     }

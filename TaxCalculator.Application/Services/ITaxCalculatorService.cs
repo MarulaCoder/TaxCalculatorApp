@@ -12,6 +12,9 @@ namespace TaxCalculator.Application.Services
     public interface ITaxCalculatorService
     {
         Task<Result<TaxCalculationDto>> CalculateTax(CalculateTaxRequest request, CancellationToken cancellationToken);
+
         Task<Result<TaxInformationDto>> GetTaxInformation(CancellationToken cancellationToken);
+
+        Task<Result<IEnumerable<CalculatedTaxDto>>> GetCalculatedTax(CancellationToken cancellationToken);
     }
 }

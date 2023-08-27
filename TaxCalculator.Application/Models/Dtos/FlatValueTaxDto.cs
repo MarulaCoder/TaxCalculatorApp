@@ -12,9 +12,9 @@ namespace TaxCalculator.Application.Models.Dtos
         #region Properties
 
         public TaxTypeEnum TaxType { get; set; }
-        public decimal TaxAmount { get; set; }
-        public decimal Threshold { get; set; }
-        public decimal ThresholdRate { get; set; }
+        public decimal? TaxAmount { get; set; }
+        public decimal? Threshold { get; set; }
+        public decimal? ThresholdRate { get; set; }
 
         #endregion
     }

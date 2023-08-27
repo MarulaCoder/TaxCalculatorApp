@@ -55,7 +55,7 @@ namespace TaxCalculator.Api.Controllers
                 return BadRequest(result.ErrorMessage);
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace TaxCalculator.Api.Controllers
         /// </summary>
         /// <param name="request">The calculate tax request</param>
         /// <returns>The calculated tax.</returns>
-        [HttpPost]
+        [HttpGet]
         [Route("information")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,7 +76,28 @@ namespace TaxCalculator.Api.Controllers
                 return BadRequest(result.ErrorMessage);
             }
 
-            return Ok(result);
+            return Ok(result.Data);
+        }
+
+        /// <summary>
+        /// Gets all taxes calculated.
+        /// </summary>
+        /// <param name="request">The calculate tax request</param>
+        /// <returns>The calculated tax.</returns>
+        [HttpGet]
+        [Route("calculated")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCalculatedTax(CancellationToken cancellationToken)
+        {
+            var result = await _taxCalculatorService.GetCalculatedTax(cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Ok(result.Data);
         }
 
         #endregion

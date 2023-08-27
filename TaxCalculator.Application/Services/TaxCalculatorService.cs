@@ -65,50 +65,57 @@ namespace TaxCalculator.Application.Services
         {
             Result<TaxInformationDto> result = Result.Failure<TaxInformationDto>("Initilization");
 
-            List<Task> tasks = new List<Task>();
-            var getFlatValueTax = _taxRepository.GetFlatValueTax(cancellationToken);
-            var getFlatRateTax = _taxRepository.GetFlatRateTax(cancellationToken);
-            var getProgressiveTax = _taxRepository.GetAllTaxRates(cancellationToken);
+            var flatTaxResult = await _taxRepository.GetFlatValueTax(cancellationToken);
+            var flatRateResult = await _taxRepository.GetFlatRateTax(cancellationToken);
+            var progressiveResult = await _taxRepository.GetAllTaxRates(cancellationToken);
 
-            tasks.Add(getFlatValueTax);
-            tasks.Add(getFlatRateTax);
-            tasks.Add(getProgressiveTax);
-
-            await Parallel.ForEachAsync(tasks, async (task, cancellationToken) => 
+            var taxInformation = new TaxInformationDto
             {
-                await task;
-            });
-
-            var flatTaxResult = getFlatValueTax.Result;
-            var flatRateResult = getFlatRateTax.Result;
-            var progressiveResult = getProgressiveTax.Result;
-
-            var taxInformation = new TaxInformationDto 
-            { 
                 FlatValueTax = new FlatValueTaxDto
-                { 
+                {
                     TaxType = TaxTypeEnum.FlatValue,
-                    TaxAmount = flatTaxResult.FlatValue,
-                    Threshold = flatTaxResult.Threshold,
-                    ThresholdRate = flatTaxResult.ThresholdRate,
+                    TaxAmount = flatTaxResult?.FlatValue,
+                    Threshold = flatTaxResult?.Threshold,
+                    ThresholdRate = flatTaxResult?.ThresholdRate,
                 },
-                FlatRateTax = new FlatRateTaxDto 
+                FlatRateTax = new FlatRateTaxDto
                 {
                     TaxType = TaxTypeEnum.FlatRate,
-                    Rate = flatRateResult.FlatRate
+                    Rate = flatRateResult?.FlatRate
                 },
                 ProgressiveTax = from tax in progressiveResult
                                  select new ProgressiveTaxDto
-                                 { 
-                                    TaxType = TaxTypeEnum.Progressive,
-                                    Rate = tax.Rate,
-                                    Level = tax.TaxLevel,
-                                    MinValue = tax.MinValue,
-                                    MaxValue = tax.MaxValue
+                                 {
+                                     TaxType = TaxTypeEnum.Progressive,
+                                     Rate = tax?.Rate,
+                                     Level = tax?.TaxLevel,
+                                     MinValue = tax?.MinValue,
+                                     MaxValue = tax?.MaxValue
                                  }
             };
 
             return Result.Success(taxInformation);
+        }
+
+        public async Task<Result<IEnumerable<CalculatedTaxDto>>> GetCalculatedTax(CancellationToken cancellationToken)
+        {
+            var calculatedTax = _taxRepository.GetAll<CalculatedTax>();
+            if (calculatedTax == null)
+            {
+                return Result.Failure<IEnumerable<CalculatedTaxDto>>("");
+            }
+
+            var calcResults = from tax in calculatedTax
+                            select new CalculatedTaxDto 
+                            {
+                                Id = tax.Id,
+                                AnnualIncome = tax.AnnualIncome,
+                                TaxAmount = tax.TaxAmount,
+                                PostalCode = tax.PostalCode,
+                                Created = tax.Created
+                            };
+
+            return Result.Success(calcResults);
         }
 
         #endregion

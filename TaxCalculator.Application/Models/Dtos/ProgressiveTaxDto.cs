@@ -12,10 +12,10 @@ namespace TaxCalculator.Application.Models.Dtos
         #region Properties
 
         public TaxTypeEnum TaxType { get; set; }
-        public decimal Rate { get; set; }
-        public decimal MinValue { get; set; }
-        public decimal MaxValue { get; set; }
-        public TaxLevelEnum Level { get; set; }
+        public decimal? Rate { get; set; }
+        public decimal? MinValue { get; set; }
+        public decimal? MaxValue { get; set; }
+        public TaxLevelEnum? Level { get; set; }
 
         #endregion
     }

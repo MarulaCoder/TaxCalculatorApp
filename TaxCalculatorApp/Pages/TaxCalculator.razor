@@ -1,0 +1,29 @@
+﻿@page "/calculator"
+
+@using TaxCalculatorApp.Data;
+
+@inject ITaxCalculatorData _taxCalculator
+
+<PageTitle>Tax Calculator</PageTitle>
+
+<h1>Tax Calculator</h1>
+
+
+
+<button class="btn btn-primary" @onclick="CalculateTax">Calculate Tax</button>
+<button class="btn btn-primary" @onclick="ResetForm">Reset</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void CalculateTax()
+    {
+        
+    }
+
+    private void ResetForm()
+    {
+        
+    
+    }
+}

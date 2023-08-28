@@ -1,0 +1,142 @@
+﻿@page "/tax/information"
+
+@inject ITaxService _taxService
+
+
+
+<PageTitle>Tax Information</PageTitle>
+
+@if (taxInformation == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mt-3 mb-3">
+                <div class="card-header">
+                    <h2>Tax Information</h2>
+                    <p>Below is tax information as it applies currently.</p>
+                </div>
+                <div class="card-body">
+                    <h4>Flat Value Tax</h4>
+                    <div>
+                        <p><span>@string.Format("{0:C}", taxInformation.FlatValueTax.TaxAmount)</span> per year.</p>
+                        <p>Else if the individual earns less than <span>@string.Format("{0:C}", taxInformation.FlatValueTax.Threshold)</span> per year the tax will be at <span>@string.Format("{0:0.0}", taxInformation.FlatValueTax.ThresholdRate)</span>%.</p>
+                    </div>
+
+                    <h4>Flat Rate Tax</h4>
+                    <div>
+                        <p>All users pay <span>@string.Format("{0:0.0}", taxInformation.FlatRateTax.Rate)</span>% tax on their income.</p>
+                    </div>
+
+                    <h4>Progressive Tax</h4>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Rate</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>More Info</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var progressiveTax in taxInformation.ProgressiveTax)
+                            {
+                                <tr>
+                                    <td>@progressiveTax.Id</td>
+                                    <td>@string.Format("{0:0.0}", progressiveTax.Rate)%</td>
+                                    <td>@string.Format("{0:C}", progressiveTax.MinValue)</td>
+                                    <td>@string.Format("{0:C}", progressiveTax.MaxValue)</td>
+                                    <td>@progressiveTax.AdditionalInformation</td>
+                                    <td><button type="button" class="btn btn-primary btn-sm" @onclick="@(() => EditItem(progressiveTax))">Edit</button></td>
+                                    <td><button type="button" class="btn btn-danger btn-sm" @onclick="@(() => DeleteProgressiveTaxItem(progressiveTax.Id))">Delete</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    @if (showEditDialog)
+                    {
+                        <h2>Edit Progressive Tax Level</h2>
+                        <EditForm Model="@progressiveTax" OnValidSubmit="EditProgressiveTaxItem">
+                            <div class="form-group row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="control-label" for="rate">Rate</label>
+                                    <InputNumber id="rate" @bind-Value="progressiveTax.Rate" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="control-label" for="minValue">MinValue</label>
+                                    <InputNumber id="minValue" @bind-Value="progressiveTax.MinValue" class="form-control" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="control-label" for="maxValue">MaxValue</label>
+                                    <InputNumber id="maxValue" @bind-Value="progressiveTax.MaxValue" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group" align="right">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="button" class="btn btn-success" @onclick="CancelItemEdit">Cancel</button>
+                            </div>
+
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private TaxInformation taxInformation;
+    private ProgressiveTax progressiveTax;
+    private bool showEditDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTaxInformation();
+    }
+
+    private void EditItem(ProgressiveTax taxItem)
+    {
+        progressiveTax = taxItem;
+        showEditDialog = true;
+    }
+
+    private async Task EditProgressiveTaxItem()
+    {
+        showEditDialog = false;
+
+        await _taxService.UpdateProgressiveTaxItem(progressiveTax);
+
+        await GetTaxInformation();
+
+        progressiveTax = null;
+    }
+
+    private async Task DeleteProgressiveTaxItem(int id)
+    {
+        await _taxService.DeleteProgressiveTaxItem(id);
+
+        await GetTaxInformation();
+    }
+
+    private async Task GetTaxInformation()
+    {
+        var result = await _taxService.GetTaxInformation();
+        taxInformation = result;        
+    }
+
+    private void CancelItemEdit()
+    {
+        showEditDialog = false;
+        progressiveTax = null;
+    }
+}

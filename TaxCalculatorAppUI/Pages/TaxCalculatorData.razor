@@ -1,0 +1,85 @@
+﻿@page "/tax/calculator"
+
+@inject ITaxService _taxService;
+
+<PageTitle>Tax Calculator</PageTitle>
+
+@if (postalCodes == null || !postalCodes.Any())
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mt-3 mb-3">
+                <div class="card-header">
+                    <h2>Tax Calculator</h2>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@taxCalculateRequest" OnValidSubmit="CalculateTax">
+                        <div class="form-group row">
+                            <div class="col-md-6 mb-3">
+                                <label class="control-label" for="AnnualIncome">Annual Income</label>
+                                <InputNumber id="annualIncome" @bind-Value="taxCalculateRequest.AnnualIncome" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="control-label" for="postalCode">Postal Code</label>
+                                <InputSelect id="postalCode" class="form-control" @bind-Value="@taxCalculateRequest.PostalCode">
+                                    <option value="">--Select--</option>
+                                    @foreach (var postalCode in postalCodes)
+                                    {
+                                        <option value="@postalCode">@postalCode</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        <div class="form-group" align="right">
+                            <button type="submit" class="btn btn-primary">Calculate</button>
+                            <button type="button" class="btn btn-success" @onclick="ResetForm">Reset</button>
+                        </div>
+
+                    </EditForm>
+
+                    @if (taxCalculation != null)
+                    {
+                        <h4>Tax Calculation Summary</h4>
+                        <div>
+                            <h6 class="card-text"><b>Annual Income</b>: <small>@string.Format("{0:C}", taxCalculation.AnnualIncome)</small></h6>
+                            <h6 class="card-text"><b>Tax Amount</b>: <small>@string.Format("{0:C}", taxCalculation.TaxAmount)</small> </h6>
+                            <h6 class="card-text"><b>Income After Tax</b>: <small>@string.Format("{0:C}", taxCalculation.IncomeAfterTax)</small></h6>
+                            <h6 class="card-text"><b>Tax Type</b>: <small>@taxCalculation.TaxMethod.TaxType</small> </h6>
+                            <h6 class="card-text"><b>Description</b>: <small>@taxCalculation.TaxMethod.TaxDescription</small> <NavLink class="nav-link" href="tax/information">Tax Information</NavLink></h6>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private TaxCalculateRequest taxCalculateRequest = new TaxCalculateRequest();
+    private TaxCalculation taxCalculation;
+    private IEnumerable<string> postalCodes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _taxService.GetPostalCodes();
+        postalCodes = result;
+    }
+
+    private async Task CalculateTax()
+    {
+        var result = await _taxService.CalculateTax(taxCalculateRequest);
+        taxCalculation = result;
+    }
+
+    private void ResetForm()
+    {
+        taxCalculation = null;  
+        taxCalculateRequest = new TaxCalculateRequest();
+    }
+}

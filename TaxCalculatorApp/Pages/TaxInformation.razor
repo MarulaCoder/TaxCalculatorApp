@@ -1,0 +1,51 @@
+﻿@page "/taxinformation"
+
+@using TaxCalculatorApp.Data
+@using TaxCalculatorApp.Models.Core
+
+@inject ITaxCalculatorData _taxCalculator
+
+<PageTitle>Tax Information</PageTitle>
+
+<h1>Tax Information</h1>
+
+<p>Below is the tax information that aaplies currently.</p>
+
+@if (taxInformation == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tax Level</th>
+                <th>Rate</th>
+                <th>From</th>
+                <th>To</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var taxInfo in taxInformation.ProgressiveTax)
+            {
+                <tr>
+                    <td>@taxInfo.Level</td>
+                    <td>@taxInfo.Rate</td>
+                    <td>@taxInfo.MinValue</td>
+                    <td>@taxInfo.MaxValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private TaxCalculatorApp.Models.Core.TaxInformation? taxInformation;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = new CancellationToken();
+        taxInformation = await _taxCalculator.GetTaxInformation(token);
+    }
+}

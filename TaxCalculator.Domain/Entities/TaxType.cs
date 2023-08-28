@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaxCalculator.Domain.Core.Enums;
+﻿using TaxCalculator.Domain.Core.Enums;
 using TaxCalculator.Domain.Core.Shared;
 
 namespace TaxCalculator.Domain.Core.Entities
@@ -12,7 +7,7 @@ namespace TaxCalculator.Domain.Core.Entities
     {
         #region Constructors
 
-        public TaxType(string code, TaxTypeEnum type) 
+        private TaxType(string code, TaxTypeEnum type) 
         {
             Code = code;
             Type = type;

@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaxCalculator.Domain.Core.Shared;
+﻿using TaxCalculator.Domain.Core.Shared;
 
 namespace TaxCalculator.Domain.Core.Entities
 {
     public class CalculatedTax : IEntity
     {
-        #region Fields
-        #endregion
-
         #region Constructors
 
         private CalculatedTax(decimal annualIncome, decimal taxAmount, string postalCode) 

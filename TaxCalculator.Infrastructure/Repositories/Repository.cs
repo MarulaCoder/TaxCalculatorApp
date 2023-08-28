@@ -1,11 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Repositories;
-using TaxCalculator.Domain.Core.Shared;
 using TaxCalculator.Infrastructure.Context;
 
 namespace TaxCalculator.Infrastructure.Repositories

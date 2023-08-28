@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using TaxCalculator.Application.Mapping;
+using TaxCalculator.Domain.Core.Entities;
 using TaxCalculator.Domain.Core.Enums;
 
 namespace TaxCalculator.Application.Models.Dtos
 {
-    public class FlatValueTaxDto
+    public class FlatValueTaxDto : IMapFrom<FlatValueTax>
     {
         #region Properties
 
@@ -16,6 +14,11 @@ namespace TaxCalculator.Application.Models.Dtos
         public decimal? TaxAmount { get; set; }
         public decimal? Threshold { get; set; }
         public decimal? ThresholdRate { get; set; }
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<FlatValueTax, FlatValueTaxDto>();
+        }
 
         #endregion
     }

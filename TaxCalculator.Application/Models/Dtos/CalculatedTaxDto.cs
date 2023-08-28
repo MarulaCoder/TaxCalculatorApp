@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using TaxCalculator.Application.Mapping;
+using TaxCalculator.Domain.Core.Entities;
 
 namespace TaxCalculator.Application.Models.Dtos
 {
-    public class CalculatedTaxDto
+    public class CalculatedTaxDto : IMapFrom<CalculatedTax>
     {
         #region Properties
 
@@ -15,6 +13,11 @@ namespace TaxCalculator.Application.Models.Dtos
         public decimal TaxAmount { get; set; }
         public string PostalCode { get; set; }
         public DateTime Created { get; set; }
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<CalculatedTax, CalculatedTaxDto>();
+        }
 
         #endregion
     }

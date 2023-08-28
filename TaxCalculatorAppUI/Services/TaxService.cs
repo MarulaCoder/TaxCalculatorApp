@@ -1,11 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text;
-using System.Net.Http.Json;
 using TaxCalculatorAppUI.Models.Core;
 using TaxCalculatorAppUI.Models.Requests;
-using static System.Net.WebRequestMethods;
-using System.Net.Http;
-using System.Net.Mime;
 
 namespace TaxCalculatorAppUI.Services
 {

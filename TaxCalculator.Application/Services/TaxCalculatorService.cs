@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using TaxCalculator.Application.Models.Dtos;
 using TaxCalculator.Application.Models.Requests;
 using TaxCalculator.Application.Models.Response;
@@ -20,14 +15,16 @@ namespace TaxCalculator.Application.Services
         #region Fields
 
         private readonly ITaxRepository _taxRepository;
+        private readonly IMapper _mapper;
 
         #endregion
 
         #region Constructors
 
-        public TaxCalculatorService(ITaxRepository taxRepository)
+        public TaxCalculatorService(ITaxRepository taxRepository, IMapper mapper)
         { 
             _taxRepository = taxRepository ?? throw new ArgumentNullException(nameof(taxRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         #endregion
@@ -36,21 +33,19 @@ namespace TaxCalculator.Application.Services
 
         public async Task<Result<TaxCalculationDto>> CalculateTax(CalculateTaxRequest request, CancellationToken cancellationToken)
         {
-            Result<TaxCalculationDto> result = Result.Failure<TaxCalculationDto>("Initilization");
-
             var taxType = await _taxRepository.GetTaxType(request.PostalCode, cancellationToken);
-            if (taxType == null) 
+            if (taxType == null)
             {
                 return Result.Failure<TaxCalculationDto>("Tax type not found.");
             }
 
-            result = taxType.Type switch 
-            { 
+            Result<TaxCalculationDto> result = taxType.Type switch
+            {
                 TaxTypeEnum.FlatValue => await CalculateFlatValueTax(request.AnnualIncome, cancellationToken),
                 TaxTypeEnum.FlatRate => await CalculateFlatRateTax(request.AnnualIncome, cancellationToken),
                 TaxTypeEnum.Progressive => await CalculateProgressiveTax(request.AnnualIncome, cancellationToken),
                 _ => Result.Failure<TaxCalculationDto>($"{taxType.Type} calculation is not implemented.")
-            };
+            };            
 
             if (result.IsSuccessful)
             {
@@ -71,30 +66,10 @@ namespace TaxCalculator.Application.Services
 
             var taxInformation = new TaxInformationDto
             {
-                FlatValueTax = new FlatValueTaxDto
-                {
-                    Id = flatValueTaxResult.Id,
-                    TaxType = TaxTypeEnum.FlatValue,
-                    TaxAmount = flatValueTaxResult?.FlatValue,
-                    Threshold = flatValueTaxResult?.Threshold,
-                    ThresholdRate = flatValueTaxResult?.ThresholdRate,
-                },
-                FlatRateTax = new FlatRateTaxDto
-                {
-                    Id = flatRateTaxResult.Id,
-                    TaxType = TaxTypeEnum.FlatRate,
-                    Rate = flatRateTaxResult?.FlatRate
-                },
+                FlatValueTax = _mapper.Map<FlatValueTaxDto>(flatValueTaxResult),
+                FlatRateTax = _mapper.Map<FlatRateTaxDto>(flatRateTaxResult),
                 ProgressiveTax = from progressiveTax in progressiveTaxResult
-                                 select new ProgressiveTaxDto
-                                 {
-                                     Id = progressiveTax.Id,
-                                     TaxType = TaxTypeEnum.Progressive,
-                                     Rate = progressiveTax?.Rate,
-                                     MinValue = progressiveTax?.MinValue,
-                                     MaxValue = progressiveTax?.MaxValue,
-                                     AdditionalInformation = progressiveTax?.AdditionalInformation
-                                 }
+                                 select _mapper.Map<ProgressiveTaxDto>(progressiveTax)
             };
 
             return Result.Success(taxInformation);
@@ -109,14 +84,7 @@ namespace TaxCalculator.Application.Services
             }
 
             var calcResults = from tax in calculatedTax
-                            select new CalculatedTaxDto 
-                            {
-                                Id = tax.Id,
-                                AnnualIncome = tax.AnnualIncome,
-                                TaxAmount = tax.TaxAmount,
-                                PostalCode = tax.PostalCode,
-                                Created = tax.Created
-                            };
+                            select _mapper.Map<CalculatedTaxDto>(tax);
 
             return Result.Success(calcResults);
         }
@@ -256,7 +224,6 @@ namespace TaxCalculator.Application.Services
         private Result<ProgressiveTaxResponse> PerformProgressiveTaxCalculation(decimal annualIncome, List<ProgressiveTax> taxRates)
         {                       
             decimal totalTaxAmount = 0;
-            ProgressiveTax currentTaxRate = null;
             foreach(var rate in taxRates)
             {
                 decimal taxAmount = Math.Min(annualIncome, rate.MaxValue);
@@ -265,7 +232,6 @@ namespace TaxCalculator.Application.Services
                     break;
                 }
 
-                currentTaxRate = rate;
                 decimal levelTaxAmount = taxAmount * PercentageUtil.GetPercentage(rate.Rate);
                 totalTaxAmount += levelTaxAmount;
 
@@ -275,7 +241,7 @@ namespace TaxCalculator.Application.Services
             var response = new ProgressiveTaxResponse
             {
                 TaxAmount = totalTaxAmount,
-                TaxDescription = currentTaxRate != null ? $"A {currentTaxRate?.Rate}% was applied to the annual income. See tax information for more info." : string.Empty
+                TaxDescription = $"A progressive tax calculation was applied to the annual income. See tax information for more info."
             };
 
             return Result.Success(response);

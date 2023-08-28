@@ -1,11 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Entities;
 using TaxCalculator.Domain.Core.Enums;
 using TaxCalculator.Infrastructure.Context;
@@ -54,7 +48,6 @@ namespace TaxCalculator.Infrastructure.SeedData
             _dbContext.Database.EnsureCreated();
             _dbContext.Database.Migrate();
 
-            // Look for any movies.
             if (!_dbContext.ProgressiveTaxRates.Any())
             {
                 var taxRates = GetProgressiveTaxRates();
@@ -80,14 +73,6 @@ namespace TaxCalculator.Infrastructure.SeedData
             }
 
             _dbContext.SaveChanges();
-        }
-
-        public static void ResetSeedData(IServiceProvider serviceProvider)
-        {
-            using var _dbContext = serviceProvider.GetRequiredService<AppDbContext>();
-            _dbContext.Database.EnsureDeleted();
-            _dbContext.Database.EnsureCreated();
-            _dbContext.Database.Migrate();
         }
     }
 }

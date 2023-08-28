@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaxCalculator.Domain.Core.Repositories;
 using TaxCalculator.Infrastructure.Context;
 using TaxCalculator.Infrastructure.Repositories;
@@ -36,10 +31,6 @@ namespace TaxCalculator.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                options.UseSqlServer(connectionString,
                    builder => builder.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
-
-            //services.AddDbContextFactory<AppDbContext>(
-            //    options =>
-            //        options.UseSqlServer(connectionString));
 
             return services;
         }

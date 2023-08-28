@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using TaxCalculator.Application;
 using TaxCalculator.Infrastructure;
-using TaxCalculator.Infrastructure.Context;
 using TaxCalculator.Infrastructure.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);

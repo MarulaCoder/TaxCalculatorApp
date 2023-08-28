@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using TaxCalculator.Application.Mapping;
+using TaxCalculator.Domain.Core.Entities;
 using TaxCalculator.Domain.Core.Enums;
 
 namespace TaxCalculator.Application.Models.Dtos
 {
-    public class ProgressiveTaxDto
+    public class ProgressiveTaxDto : IMapFrom<ProgressiveTax>
     {
         #region Properties
 
@@ -17,6 +15,11 @@ namespace TaxCalculator.Application.Models.Dtos
         public decimal? MinValue { get; set; }
         public decimal? MaxValue { get; set; }
         public string AdditionalInformation { get; set; }
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<ProgressiveTax, ProgressiveTaxDto>();
+        }
 
         #endregion
     }

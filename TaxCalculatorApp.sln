@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxCalculator.Api", "TaxCal
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{F7AEAB69-53BF-4FF8-9E42-DFC36EEC2059}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaxCalculatorAppUI", "TaxCalculatorAppUI\TaxCalculatorAppUI.csproj", "{0572886F-8DE0-4B34-BCB8-BF12305423CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxCalculatorAppUI", "TaxCalculatorAppUI\TaxCalculatorAppUI.csproj", "{0572886F-8DE0-4B34-BCB8-BF12305423CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

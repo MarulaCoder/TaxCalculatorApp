@@ -16,5 +16,13 @@ namespace TaxCalculator.Application.Services
         Task<Result<TaxInformationDto>> GetTaxInformation(CancellationToken cancellationToken);
 
         Task<Result<IEnumerable<CalculatedTaxDto>>> GetCalculatedTax(CancellationToken cancellationToken);
+
+        Task<Result<IEnumerable<string>>> GetPostalCodes(CancellationToken cancellationToken);
+
+        Task<Result> UpdateProgressiveTax(UpdateProgressiveTaxDto model, CancellationToken cancellationToken);
+
+        Task DeleteProgressiveTax(int id, CancellationToken cancellationToken);
+
+        Task DeleteCalculatedTax(int id, CancellationToken cancellationToken);
     }
 }

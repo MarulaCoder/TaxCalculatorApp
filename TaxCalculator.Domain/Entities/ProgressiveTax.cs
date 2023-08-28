@@ -8,16 +8,16 @@ using TaxCalculator.Domain.Core.Shared;
 
 namespace TaxCalculator.Domain.Core.Entities
 {
-    public class TaxRate : IEntity
+    public class ProgressiveTax : IEntity
     {
         #region Constructors
 
-        private TaxRate(decimal rate, decimal minValue, decimal maxValue, TaxLevelEnum taxLevel) 
+        private ProgressiveTax(decimal rate, decimal minValue, decimal maxValue, string additionalInformation) 
         { 
             Rate = rate;
             MinValue = minValue;
             MaxValue = maxValue;
-            TaxLevel = taxLevel;
+            AdditionalInformation = additionalInformation;
         }
 
         #endregion
@@ -28,23 +28,22 @@ namespace TaxCalculator.Domain.Core.Entities
         public decimal Rate { get; private set; }
         public decimal MinValue { get; private set; }
         public decimal MaxValue { get; private set; }
-        public TaxLevelEnum TaxLevel { get; private set; }
+        public string AdditionalInformation { get; private set; }
 
         #endregion
 
         #region Public Methods
 
-        public static TaxRate Create(decimal rate, decimal minValue, decimal maxValue, TaxLevelEnum taxLevel) 
+        public static ProgressiveTax Create(decimal rate, decimal minValue, decimal maxValue, string info) 
         { 
-            return new TaxRate(rate, minValue, maxValue, taxLevel);
+            return new ProgressiveTax(rate, minValue, maxValue, info);
         }
 
-        public void Update(decimal rate, decimal minValue, decimal maxValue, TaxLevelEnum taxLevel)
+        public void Update(decimal rate, decimal minValue, decimal maxValue)
         {
             Rate = rate;
             MinValue = minValue;
             MaxValue = maxValue;
-            TaxLevel = taxLevel;
         }
 
         #endregion

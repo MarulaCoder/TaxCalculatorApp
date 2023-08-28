@@ -11,7 +11,7 @@ namespace TaxCalculator.Application.Utility
     {
         #region Public Methods
 
-        public static decimal PerformTaxCalculation(decimal annualIncome, TaxRate taxRate)
+        public static decimal PerformTaxCalculation(decimal annualIncome, ProgressiveTax taxRate)
         {
             return annualIncome - (annualIncome * (taxRate.Rate / 100));
         }

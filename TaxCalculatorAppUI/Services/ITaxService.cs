@@ -5,8 +5,18 @@ namespace TaxCalculatorAppUI.Services
 {
     public interface ITaxService
     {
-        Task<TaxCalculation> CalculateTax(TaxCalculateRequest calculateRequest, CancellationToken cancellationToken);
+        Task<TaxCalculation> CalculateTax(TaxCalculateRequest calculateRequest);
 
-        Task<TaxInformation> GetTaxInformation(CancellationToken cancellationToken);
+        Task<TaxInformation> GetTaxInformation();
+
+        Task<IEnumerable<TaxHistory>> GetCalculatedTaxHistory();
+
+        Task<IEnumerable<string>> GetPostalCodes();
+
+        Task DeleteTaxHistoryItem(int id);
+
+        Task UpdateProgressiveTaxItem(ProgressiveTax progressiveTax);
+
+        Task DeleteProgressiveTaxItem(int id);
     }
 }

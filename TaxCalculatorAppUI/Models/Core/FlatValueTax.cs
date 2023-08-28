@@ -6,7 +6,8 @@ namespace TaxCalculatorAppUI.Models.Core
     {
         #region Properties
 
-        public TaxTypeEnum TaxType { get; set; }
+        public int Id { get; set; }
+        public string TaxType { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal Threshold { get; set; }
         public decimal ThresholdRate { get; set; }

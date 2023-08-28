@@ -11,6 +11,7 @@ namespace TaxCalculator.Application.Models.Dtos
     {
         #region Properties
 
+        public int Id { get; set; }
         public TaxTypeEnum TaxType { get; set; }
         public decimal? Rate { get; set; }
 

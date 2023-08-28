@@ -25,16 +25,16 @@ namespace TaxCalculator.Infrastructure.SeedData
             };
         }
 
-        public static List<TaxRate> GetTaxRates() 
+        public static List<ProgressiveTax> GetProgressiveTaxRates() 
         {
-            return new List<TaxRate>()
+            return new List<ProgressiveTax>()
             {
-                TaxRate.Create(10M, 0M, 8350M, TaxLevelEnum.LevelOne),
-                TaxRate.Create(15M, 8351M, 33950M, TaxLevelEnum.LevelTwo),
-                TaxRate.Create(25M, 33951M, 82250M, TaxLevelEnum.LevelThree),
-                TaxRate.Create(28M, 82251M, 171550M, TaxLevelEnum.LevelFour),
-                TaxRate.Create(33M, 171551M, 372950M, TaxLevelEnum.LevelThree),
-                TaxRate.Create(35M, 372951M, 0M, TaxLevelEnum.LevelSix)
+                ProgressiveTax.Create(10M, 0M, 8350M, string.Empty),
+                ProgressiveTax.Create(15M, 8351M, 33950M, "0 to 8 350 at 10%"),
+                ProgressiveTax.Create(25M, 33951M, 82250M, "8 351 to 33 950 at 15%"),
+                ProgressiveTax.Create(28M, 82251M, 171550M, "33 951 to 82 250 at 25%"),
+                ProgressiveTax.Create(33M, 171551M, 372950M, "82 251 to 171 550 at 28%"),
+                ProgressiveTax.Create(35M, 372951M, 0M, "171 551 to 372 950 at 33%")
             };
         }
 
@@ -55,10 +55,10 @@ namespace TaxCalculator.Infrastructure.SeedData
             _dbContext.Database.Migrate();
 
             // Look for any movies.
-            if (!_dbContext.TaxRates.Any())
+            if (!_dbContext.ProgressiveTaxRates.Any())
             {
-                var taxRates = GetTaxRates();
-                _dbContext.TaxRates.AddRange(taxRates);
+                var taxRates = GetProgressiveTaxRates();
+                _dbContext.ProgressiveTaxRates.AddRange(taxRates);
             }
 
             if (!_dbContext.TaxTypes.Any())

@@ -35,14 +35,14 @@ namespace TaxCalculator.Infrastructure.Repositories
             return await _dbContext.TaxTypes.FirstOrDefaultAsync(x => x.Code == code);
         }
 
-        public async Task<TaxRate> GetTaxRateByIncome(decimal annualIncome, CancellationToken cancellationToken)
+        public async Task<ProgressiveTax> GetProgressiveTaxRateByIncome(decimal annualIncome, CancellationToken cancellationToken)
         {
-            return await _dbContext.TaxRates.FirstOrDefaultAsync(x => x.MinValue >= annualIncome && x.MaxValue <= annualIncome);
+            return await _dbContext.ProgressiveTaxRates.FirstOrDefaultAsync(x => x.MinValue >= annualIncome && x.MaxValue <= annualIncome);
         }
 
-        public async Task<List<TaxRate>> GetAllTaxRates(CancellationToken cancellationToken)
+        public async Task<List<ProgressiveTax>> GetProgressiveTaxRates(CancellationToken cancellationToken)
         { 
-            var result = await _dbContext.TaxRates.ToListAsync();
+            var result = await _dbContext.ProgressiveTaxRates.ToListAsync();
             return result;
         }
 
@@ -64,9 +64,6 @@ namespace TaxCalculator.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        #endregion
-
-        #region Private Methods
         #endregion
     }
 }

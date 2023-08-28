@@ -11,9 +11,9 @@ namespace TaxCalculator.Domain.Core.Repositories
     {
         Task<TaxType> GetTaxType(string code, CancellationToken cancellationToken);
 
-        Task<TaxRate> GetTaxRateByIncome(decimal annualIncome, CancellationToken cancellationToken);
+        Task<ProgressiveTax> GetProgressiveTaxRateByIncome(decimal annualIncome, CancellationToken cancellationToken);
 
-        Task<List<TaxRate>> GetAllTaxRates(CancellationToken cancellationToken);
+        Task<List<ProgressiveTax>> GetProgressiveTaxRates(CancellationToken cancellationToken);
 
         Task<FlatValueTax> GetFlatValueTax(CancellationToken cancellationToken);
 

@@ -6,10 +6,12 @@ namespace TaxCalculatorAppUI.Models.Core
     {
         #region Properties
 
+        public int Id { get; set; }
+        public string TaxType { get; set; }
         public decimal Rate { get; set; }
         public decimal MinValue { get; set; }
         public decimal MaxValue { get; set; }
-        public TaxLevelEnum Level { get; set; }
+        public string AdditionalInformation { get; set; }
 
         #endregion
     }

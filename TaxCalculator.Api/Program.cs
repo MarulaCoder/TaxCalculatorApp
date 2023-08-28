@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(); 
+app.UseCors("CorsPolicy"); 
 
 app.UseHttpsRedirection();
 
@@ -56,5 +56,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// app.Run("http://localhost:4000");
+//app.Run("https://localhost:4000");
 app.Run();

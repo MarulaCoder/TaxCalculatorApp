@@ -5,6 +5,7 @@ using TaxCalculatorAppUI.Models.Core;
 using TaxCalculatorAppUI.Models.Requests;
 using static System.Net.WebRequestMethods;
 using System.Net.Http;
+using System.Net.Mime;
 
 namespace TaxCalculatorAppUI.Services
 {
@@ -12,8 +13,8 @@ namespace TaxCalculatorAppUI.Services
     {
         #region Fields
 
+        private readonly HttpClient _httpClient;
         private readonly string _url = $"api/taxcalculator";
-        private readonly HttpClient _client;
         private readonly JsonSerializerOptions _options;
         private readonly IHttpClientFactory _clientFactory;
 
@@ -21,30 +22,29 @@ namespace TaxCalculatorAppUI.Services
 
         #region Constructors
 
-        public TaxService(HttpClient client, IHttpClientFactory clientFactory)
+        public TaxService(IHttpClientFactory clientFactory)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
             _clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
-            _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true }; //new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            _httpClient = _clientFactory.CreateClient("TaxCalculatorApi");
+
+            _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         #endregion
 
         #region Public Methods
 
-        public async Task<TaxCalculation> CalculateTax(TaxCalculateRequest calculateRequest, CancellationToken cancellationToken)
+        public async Task<TaxCalculation> CalculateTax(TaxCalculateRequest calculateRequest)
         {
             var result = new TaxCalculation();
             var requestUri = $"{_url}/calculate";
 
-            var taxRequest = JsonSerializer.Serialize(calculateRequest);
-            var content = new StringContent(taxRequest, Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(calculateRequest, _options), Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-            request.Headers.Add("Accept", "application/vnd.github.v3+json");
             request.Content = content;
 
-            var response = await _client.SendAsync(request, cancellationToken);
+            var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 var stringResponse = await response.Content.ReadAsStringAsync();
@@ -55,28 +55,85 @@ namespace TaxCalculatorAppUI.Services
             return result;
         }
 
-        public async Task<TaxInformation> GetTaxInformation(CancellationToken cancellationToken)
+        public async Task<TaxInformation> GetTaxInformation()
         {
-            var result = new TaxInformation();
             var requestUri = $"{_url}/information";
 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-            request.Headers.Add("Accept", "application/json");
 
-            //var response = await _client.SendAsync(request, cancellationToken);
-            //result = await _client.GetFromJsonAsync<TaxInformation>(requestUri);
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var stringResponse = await response.Content.ReadAsStringAsync();
 
-            var _client2 = _clientFactory.CreateClient("TaxCalculatorApi");
-            result = await _client2.GetFromJsonAsync<TaxInformation>(requestUri);
+                return JsonSerializer.Deserialize<TaxInformation>(stringResponse, _options);
+            }
 
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    var stringResponse = await response.Content.ReadAsStringAsync();
+            return null;
+        }
 
-            //    result = JsonSerializer.Deserialize<TaxInformation>(stringResponse, _options);
-            //}
+        public async Task<IEnumerable<TaxHistory>> GetCalculatedTaxHistory()
+        {
+            var requestUri = $"{_url}/calculated";
 
-            return result;
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var stringResponse = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<IEnumerable<TaxHistory>>(stringResponse, _options);
+            }
+
+            return Enumerable.Empty<TaxHistory>();
+        }
+
+        public async Task<IEnumerable<string>> GetPostalCodes()
+        {
+            var requestUri = $"{_url}/codes";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var stringResponse = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<IEnumerable<string>>(stringResponse, _options);
+            }
+
+            return Enumerable.Empty<string>();
+        }
+
+        public async Task DeleteTaxHistoryItem(int id)
+        {
+            var requestUri = $"{_url}/calculated/delete/{id}";
+
+            var request = new HttpRequestMessage(HttpMethod.Delete, requestUri);
+
+            await _httpClient.SendAsync(request);
+        }
+
+        public async Task UpdateProgressiveTaxItem(ProgressiveTax progressiveTax)
+        {
+            var requestUri = $"{_url}/tax/progressive/update/{progressiveTax.Id}";
+
+            var content = new StringContent(JsonSerializer.Serialize(progressiveTax, _options), Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Put, requestUri);
+            request.Content = content;
+
+            await _httpClient.SendAsync(request);
+        }
+
+        public async Task DeleteProgressiveTaxItem(int id)
+        {
+            var requestUri = $"{_url}/tax/progressive/delete/{id}";
+
+            var request = new HttpRequestMessage(HttpMethod.Delete, requestUri);
+
+            await _httpClient.SendAsync(request);
         }
 
         #endregion

@@ -65,32 +65,35 @@ namespace TaxCalculator.Application.Services
         {
             Result<TaxInformationDto> result = Result.Failure<TaxInformationDto>("Initilization");
 
-            var flatTaxResult = await _taxRepository.GetFlatValueTax(cancellationToken);
-            var flatRateResult = await _taxRepository.GetFlatRateTax(cancellationToken);
-            var progressiveResult = await _taxRepository.GetAllTaxRates(cancellationToken);
+            var flatValueTaxResult = await _taxRepository.GetFlatValueTax(cancellationToken);
+            var flatRateTaxResult = await _taxRepository.GetFlatRateTax(cancellationToken);
+            var progressiveTaxResult = await _taxRepository.GetProgressiveTaxRates(cancellationToken);
 
             var taxInformation = new TaxInformationDto
             {
                 FlatValueTax = new FlatValueTaxDto
                 {
+                    Id = flatValueTaxResult.Id,
                     TaxType = TaxTypeEnum.FlatValue,
-                    TaxAmount = flatTaxResult?.FlatValue,
-                    Threshold = flatTaxResult?.Threshold,
-                    ThresholdRate = flatTaxResult?.ThresholdRate,
+                    TaxAmount = flatValueTaxResult?.FlatValue,
+                    Threshold = flatValueTaxResult?.Threshold,
+                    ThresholdRate = flatValueTaxResult?.ThresholdRate,
                 },
                 FlatRateTax = new FlatRateTaxDto
                 {
+                    Id = flatRateTaxResult.Id,
                     TaxType = TaxTypeEnum.FlatRate,
-                    Rate = flatRateResult?.FlatRate
+                    Rate = flatRateTaxResult?.FlatRate
                 },
-                ProgressiveTax = from tax in progressiveResult
+                ProgressiveTax = from progressiveTax in progressiveTaxResult
                                  select new ProgressiveTaxDto
                                  {
+                                     Id = progressiveTax.Id,
                                      TaxType = TaxTypeEnum.Progressive,
-                                     Rate = tax?.Rate,
-                                     Level = tax?.TaxLevel,
-                                     MinValue = tax?.MinValue,
-                                     MaxValue = tax?.MaxValue
+                                     Rate = progressiveTax?.Rate,
+                                     MinValue = progressiveTax?.MinValue,
+                                     MaxValue = progressiveTax?.MaxValue,
+                                     AdditionalInformation = progressiveTax?.AdditionalInformation
                                  }
             };
 
@@ -100,9 +103,9 @@ namespace TaxCalculator.Application.Services
         public async Task<Result<IEnumerable<CalculatedTaxDto>>> GetCalculatedTax(CancellationToken cancellationToken)
         {
             var calculatedTax = _taxRepository.GetAll<CalculatedTax>();
-            if (calculatedTax == null)
+            if (calculatedTax == null || !calculatedTax.Any())
             {
-                return Result.Failure<IEnumerable<CalculatedTaxDto>>("");
+                return Result.Failure<IEnumerable<CalculatedTaxDto>>("No calculated tax found.");
             }
 
             var calcResults = from tax in calculatedTax
@@ -118,20 +121,55 @@ namespace TaxCalculator.Application.Services
             return Result.Success(calcResults);
         }
 
+        public async Task<Result<IEnumerable<string>>> GetPostalCodes(CancellationToken cancellationToken)
+        {
+            var taxTypes = _taxRepository.GetAll<TaxType>();
+            if (taxTypes == null || !taxTypes.Any())
+            {
+                return Result.Failure<IEnumerable<string>>("");
+            }
+
+            var postalCodes = from types in taxTypes
+                              select types.Code;
+
+            return Result.Success(postalCodes);
+        }
+
+        public async Task<Result> UpdateProgressiveTax(UpdateProgressiveTaxDto model, CancellationToken cancellationToken)
+        {
+            var progressiveTax = await _taxRepository.GetByIdAsync<ProgressiveTax>(model.Id, cancellationToken);
+            if (progressiveTax == null) 
+            {
+                return Result.Failure($"Progressive tax with {model.Id} not found.");
+            }
+
+            progressiveTax.Update(model.Rate, model.MinValue, model.MaxValue);
+            await _taxRepository.UpdateAsync(progressiveTax, cancellationToken);
+            return Result.Success(progressiveTax);
+        }
+
+        public async Task DeleteProgressiveTax(int id, CancellationToken cancellationToken)
+        {
+            await _taxRepository.DeleteAsync<ProgressiveTax>(id, cancellationToken);
+        }
+
+        public async Task DeleteCalculatedTax(int id, CancellationToken cancellationToken)
+        {
+            await _taxRepository.DeleteAsync<CalculatedTax>(id, cancellationToken);
+        }
+
         #endregion
 
         #region Private Methods
 
         private async Task<Result<TaxCalculationDto>> CalculateFlatValueTax(decimal annualIncome, CancellationToken cancellationToken)
         {
-            var result = Result.Failure<TaxCalculationDto>("Initilization");
             decimal taxAmount;
 
             var flatValueTax = await _taxRepository.GetFlatValueTax(cancellationToken);
             if (flatValueTax == null) 
             {
-                result = Result.Failure<TaxCalculationDto>("Flat Value tax rate not found.");
-                return result;
+                return Result.Failure<TaxCalculationDto>("Flat Value tax rate not found.");
             }
 
             if (annualIncome < flatValueTax.Threshold)
@@ -151,24 +189,19 @@ namespace TaxCalculator.Application.Services
                 TaxMethod = new TaxMethodDto 
                 { 
                     TaxType = TaxTypeEnum.FlatValue,
-                    TaxDescription = $"{flatValueTax.FlatValue} per year, else if the individual earns less that {flatValueTax.Threshold} per year the tax will be at {flatValueTax.ThresholdRate}%"
+                    TaxDescription = $"{string.Format("{0:C}", flatValueTax.FlatValue)} per year, else if the individual earns less that {string.Format("{0:C}", flatValueTax.Threshold)} per year the tax will be at {string.Format("{0:0.0}", flatValueTax.ThresholdRate)}%"
                 }
             };
 
-            result = Result.Success(taxCalculation);
-
-            return result;
+            return Result.Success(taxCalculation);
         }
 
         private async Task<Result<TaxCalculationDto>> CalculateFlatRateTax(decimal annualIncome, CancellationToken cancellationToken)
         {
-            var result = Result.Failure<TaxCalculationDto>("Initilization");
-
             var flatRateTax = await _taxRepository.GetFlatRateTax(cancellationToken);
             if (flatRateTax == null)
             {
-                result = Result.Failure<TaxCalculationDto>("Flat Rate tax rate not found.");
-                return result;
+                return Result.Failure<TaxCalculationDto>("Flat Rate tax rate not found.");
             }
 
             decimal taxAmount = annualIncome * PercentageUtil.GetPercentage(flatRateTax.FlatRate);
@@ -181,20 +214,18 @@ namespace TaxCalculator.Application.Services
                 TaxMethod = new TaxMethodDto
                 {
                     TaxType = TaxTypeEnum.FlatRate,
-                    TaxDescription = $"All users pay {flatRateTax.FlatRate}% tax on their income."
+                    TaxDescription = $"All users pay {string.Format("{0:0.0}", flatRateTax.FlatRate)}% tax on their income."
                 }
             };
 
-            result = Result.Success(taxCalculation);
-
-            return result;
+            return Result.Success(taxCalculation);
         }
 
         private async Task<Result<TaxCalculationDto>> CalculateProgressiveTax(decimal annualIncome, CancellationToken cancellationToken)
         {
             decimal taxAmount;
 
-            var taxRates = await _taxRepository.GetAllTaxRates(cancellationToken);
+            var taxRates = await _taxRepository.GetProgressiveTaxRates(cancellationToken);
             if (taxRates == null || !taxRates.Any())
             {
                 return Result.Failure<TaxCalculationDto>("Progressive tax rate not found.");
@@ -215,29 +246,37 @@ namespace TaxCalculator.Application.Services
                 TaxMethod = new TaxMethodDto
                 {
                     TaxType = TaxTypeEnum.Progressive,
-                    TaxDescription = $""
+                    TaxDescription = response.Data.TaxDescription
                 }
             };
 
             return Result.Success(taxCalculation);
         }
 
-        private Result<ProgressiveTaxResponse> PerformProgressiveTaxCalculation(decimal annualIncome, List<TaxRate> taxRates)
-        {
-            var response = new ProgressiveTaxResponse();
-            //var taxRate = taxRates.FirstOrDefault(rate => annualIncome >= rate.MinValue && annualIncome <= rate.MaxValue);
+        private Result<ProgressiveTaxResponse> PerformProgressiveTaxCalculation(decimal annualIncome, List<ProgressiveTax> taxRates)
+        {                       
             decimal totalTaxAmount = 0;
-            taxRates.ToList().ForEach(rate =>
+            ProgressiveTax currentTaxRate = null;
+            foreach(var rate in taxRates)
             {
-                decimal taxAmount = Math.Min(annualIncome, rate.MaxValue) - (totalTaxAmount * (1 - PercentageUtil.GetPercentage(rate.Rate)));
+                decimal taxAmount = Math.Min(annualIncome, rate.MaxValue);
                 if (taxAmount <= 0)
                 {
-                    return;
+                    break;
                 }
 
+                currentTaxRate = rate;
                 decimal levelTaxAmount = taxAmount * PercentageUtil.GetPercentage(rate.Rate);
                 totalTaxAmount += levelTaxAmount;
-            });
+
+                annualIncome -= taxAmount;
+            };
+
+            var response = new ProgressiveTaxResponse
+            {
+                TaxAmount = totalTaxAmount,
+                TaxDescription = currentTaxRate != null ? $"A {currentTaxRate?.Rate}% was applied to the annual income. See tax information for more info." : string.Empty
+            };
 
             return Result.Success(response);
         }

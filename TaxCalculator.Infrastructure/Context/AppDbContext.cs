@@ -26,7 +26,7 @@ namespace TaxCalculator.Infrastructure.Context
         #region Properties
 
         public virtual DbSet<TaxType> TaxTypes { get; set; }
-        public virtual DbSet<TaxRate> TaxRates { get; set; }
+        public virtual DbSet<ProgressiveTax> ProgressiveTaxRates { get; set; }
         public virtual DbSet<FlatValueTax> FlatValueTax { get; set; }
         public virtual DbSet<FlatRateTax> FlatRateTax { get; set; }
         public virtual DbSet<CalculatedTax> CalculatedTaxes { get; set; }
@@ -57,7 +57,7 @@ namespace TaxCalculator.Infrastructure.Context
                     .IsRequired();
             });
 
-            modelBuilder.Entity<TaxRate>(entity => 
+            modelBuilder.Entity<ProgressiveTax>(entity => 
             {
                 entity.Property(e => e.Id)
                     .ValueGeneratedOnAdd();
@@ -74,12 +74,9 @@ namespace TaxCalculator.Infrastructure.Context
                     .HasPrecision(19, 4)
                     .IsRequired();
 
-                entity.Property(e => e.TaxLevel)
-                    .HasConversion(
-                        v => v.ToString(),
-                        v => (TaxLevelEnum)Enum.Parse(typeof(TaxLevelEnum), v))
-                    .HasMaxLength(15)
-                    .IsRequired();
+                entity.Property(e => e.AdditionalInformation)
+                    .HasColumnType("varchar")
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<FlatValueTax>(entity => 

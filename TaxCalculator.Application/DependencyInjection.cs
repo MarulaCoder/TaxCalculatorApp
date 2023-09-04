@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TaxCalculator.Application.Services;
+using AutoMapper;
 
 namespace TaxCalculator.Application
 {
@@ -21,6 +22,7 @@ namespace TaxCalculator.Application
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services
+                .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
                 .AddScoped<ITaxCalculatorService, TaxCalculatorService>();
 
             return services;
